@@ -57,8 +57,10 @@ using NSwag.Generation.AspNetCore;
 using RabbitMQ.Client;
 using PinusDB.Data;
 using IoTSharp.Extensions;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace IoTSharp
 {
@@ -145,6 +147,12 @@ namespace IoTSharp
                 };
             });
 
+            //定义新的权限验证规则，为了绕过原有的基于角色的验证规则，主要用于测试
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicy(new []{new IotSharpAuthorizationRequirement()}, new []{ JwtBearerDefaults.AuthenticationScheme });
+            });
+            services.AddScoped<IAuthorizationHandler, IotSharpAuthorizationHandler>();
 
             services.AddCors();
             services.AddLogging(loggingBuilder => loggingBuilder.AddConsole());
@@ -192,8 +200,7 @@ namespace IoTSharp
                 //opt.Add("quartz.dataSource.myDS.connectionString", Configuration.GetConnectionString("IoTSharp"));
                 stdSchedulerFactoryOption.Add("quartz.plugin.recentHistory.type", "Quartz.Plugins.RecentHistory.ExecutionHistoryPlugin, Quartz.Plugins.RecentHistory");
                 stdSchedulerFactoryOption.Add("quartz.plugin.recentHistory.storeType", "Quartz.Plugins.RecentHistory.Impl.InProcExecutionHistoryStore, Quartz.Plugins.RecentHistory");
-            }
-        );
+            });
             services.AddControllers();
 
             services.AddMemoryCache();
@@ -375,7 +382,6 @@ namespace IoTSharp
             {
                 configuration.RootPath = "ClientApp/dist";
             });
-           
         }
 
 
