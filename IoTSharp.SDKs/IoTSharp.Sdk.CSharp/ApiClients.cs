@@ -4815,7 +4815,7 @@ namespace IoTSharp.Sdk.Http
     
         /// <summary>过期时间</summary>
         [Newtonsoft.Json.JsonProperty("expires_in", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public int Expires_in { get; set; }
+        public long Expires_in { get; set; }
     
         public string ToJson() 
         {
